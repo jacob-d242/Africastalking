@@ -40,7 +40,7 @@ app.post('/', (req, res) => {
     res.set('Content-Type: text/plain');
     res.send(response);
 });
-
+//setting up listening port
 app.listen(3000, () => {
     console.log('Server listening on port 3000');
 });
