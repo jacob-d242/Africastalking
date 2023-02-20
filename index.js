@@ -30,7 +30,12 @@ app.post('/', (req, res) => {
     if (text == '') {
         response = `CON What would you like to do today?
         1. Register a shop
-        2. Check your commission`;
+        2. Check your commission
+        3. Renew license
+        5. Update your shop
+        6. More
+        4. Help ?
+        `;
     } else if (text == '1') {
         // Ask for shop name
         response = `CON Enter the name of your shop`;
@@ -47,7 +52,7 @@ app.post('/', (req, res) => {
         registration.licenseNumber = text.slice(2);
         response = `CON Enter your ID number`;
     } else if (text.startsWith('1*') && registration.name && registration.location && registration.licenseNumber && !registration.id) {
-        
+
         // Save ID number and terminate
         registration.id = text.slice(2);
         response = `END Thank you for registering your shop with us!`;
