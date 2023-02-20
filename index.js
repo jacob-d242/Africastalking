@@ -5,8 +5,20 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+let registration = {
+    name: '',
+    location: '',
+    licenseNumber: '',
+    id: ''
+};
+
+let commission = {
+    phone: '',
+    id: '',
+    pin: ''
+};
+
 app.post('/', (req, res) => {
-    // Read the variables sent via POST from our API
     const {
         sessionId,
         serviceCode,
@@ -17,31 +29,64 @@ app.post('/', (req, res) => {
     let response = '';
 
     if (text == '') {
-        // This is the first request. Note how we start the response with CON
-        response = `CON What would you like to check
-        1. My account
-        2. My phone number`;
-    } else if ( text == '1') {
-        // Business logic for first level response
-        response = `CON Choose account information you want to view
-        1. Account number`;
-    } else if ( text == '2') {
-        // Business logic for first level response
-        // This is a terminal request. Note how we start the response with END
-        response = `END Your phone number is ${phoneNumber}`;
-    } else if ( text == '1*1') {
-        // This is a second level response where the user selected 1 in the first instance
-        const accountNumber = 'ACC100101';
-        // This is a terminal request. Note how we start the response with END
-        response = `END Your account number is ${accountNumber}`;
+        response = `CON What would you like to do today?
+        1. Register a shop
+        2. Check your commission`;
+    } else if (text == '1') {
+        // Ask for shop name
+        response = `CON Enter the name of your shop`;
+    } else if (text.startsWith('1*') && !registration.name) {
+        // Save shop name and ask for location
+        registration.name = text.slice(2);
+        response = `CON Enter the location of your shop`;
+    } else if (text.startsWith('1*') && registration.name && !registration.location) {
+        // Save shop location and ask for license number
+        registration.location = text.slice(2);
+        response = `CON Enter your shop's license number`;
+    } else if (text.startsWith('1*') && registration.name && registration.location && !registration.licenseNumber) {
+        // Save shop license number and ask for ID
+        registration.licenseNumber = text.slice(2);
+        response = `CON Enter your ID number`;
+    } else if (text.startsWith('1*') && registration.name && registration.location && registration.licenseNumber && !registration.id) {
+        // Save ID number and terminate
+        registration.id = text.slice(2);
+        response = `END Thank you for registering your shop with us!`;
+
+        // Clear registration object for next registration
+        registration = {
+            name: '',
+            location: '',
+            licenseNumber: '',
+            id: ''
+        };
+    } else if (text == '2') {
+        // Ask for phone number
+        response = `CON Enter your phone number`;
+    } else if (text.startsWith('2*') && !commission.phone) {
+        // Save phone number and ask for ID
+        commission.phone = text.slice(2);
+        response = `CON Enter your ID number`;
+    } else if (text.startsWith('2*') && commission.phone && !commission.id) {
+        // Save ID number and ask for PIN
+        commission.id = text.slice(2);
+        response = `CON Enter your PIN`;
+    } else if (text.startsWith('2*') && commission.phone && commission.id && !commission.pin) {
+        // Save PIN and terminate
+        commission.pin = text.slice(2);
+        response = `END Your commission balance is $100`;
+
+        // Clear commission object for next commission check
+        commission = {
+            phone: '',
+            id: '',
+            pin: ''
+        };
     }
 
-    // Send the response back to the API
     res.set('Content-Type: text/plain');
     res.send(response);
 });
-//setting up listening port
+
 app.listen(3000, () => {
     console.log('Server listening on port 3000');
 });
-  
