@@ -11,7 +11,6 @@ let registration = {
     licenseNumber: '',
     id: ''
 };
-
 let commission = {
     phone: '',
     id: '',
@@ -48,6 +47,7 @@ app.post('/', (req, res) => {
         registration.licenseNumber = text.slice(2);
         response = `CON Enter your ID number`;
     } else if (text.startsWith('1*') && registration.name && registration.location && registration.licenseNumber && !registration.id) {
+        
         // Save ID number and terminate
         registration.id = text.slice(2);
         response = `END Thank you for registering your shop with us!`;
