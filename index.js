@@ -1,9 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require("mongoose");
 
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+const PORT = 8000;
 
 let registration = {
     name: '',
@@ -92,6 +94,6 @@ app.post('/', (req, res) => {
     res.send(response);
 });
 
-app.listen(3000, () => {
-    console.log('Server listening on port 3000');
+app.listen(PORT, () => {
+    console.log('Server listening on port  + PORT');
 });
