@@ -1,23 +1,44 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require("mongoose");
+require('dotenv').config();
 
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 const PORT = 8000;
 
+
+
+mongoose.set("strictQuery" , false)
+const db = mongoose.connect(process.env.MONGO_URL)
+    .then(() => {
+        console.log('database connected')
+    })
+    .catch((err) => {
+        console.log (`Error connectiong to database . n${err}`)
+    })
+
 let registration = {
-    name: '',
+    firstName: '',
+    lastName: '',
     location: '',
     licenseNumber: '',
-    id: ''
+    id: '',
+    KraPinNo: '',
+    
 };
 let commission = {
     phone: '',
     id: '',
     pin: ''
 };
+
+app.get('/home', (req, res) => {
+    res.send('Successfull')
+    console.log (req.body)
+})
+
 
 app.post('/', (req, res) => {
     const {
@@ -28,7 +49,7 @@ app.post('/', (req, res) => {
     } = req.body;
 
     let response = '';
-
+    //console.log (req.body)
     if (text == '') {
         response = `CON What would you like to do today?
         1. Register a shop
@@ -91,9 +112,12 @@ app.post('/', (req, res) => {
     }
 
     res.set('Content-Type: text/plain');
-    res.send(response);
+    setTimeout(()=>{
+        res.send(response);
+        res.end()
+    }, 2000)
 });
 
 app.listen(PORT, () => {
-    console.log('Server listening on port  + PORT');
+    console.log(`Server listening on port  + ${PORT}`);
 });
