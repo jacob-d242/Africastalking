@@ -73,7 +73,6 @@ exports.handleUssdRequest = (req, res) => {
         // Save PIN and terminate
         commission.pin = text.slice(2);
         response = `END Your commission balance is $100`;
-
         // Clear commission object for next commission check
         commission = {
             phone: '',
