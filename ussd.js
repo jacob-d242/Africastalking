@@ -1,23 +1,25 @@
-let registration = {
-    name: '',
-    location: '',
-    licenseNumber: '',
-    id: '',
-};
-
-let commission = {
-    phone: '',
-    id: '',
-    pin: '',
-};
-
-exports.handleUssdRequest = (req, res) => {
+ function handleUssdRequest (req, res){
     const {
         sessionId,
         serviceCode,
         phoneNumber,
         text,
     } = req.body;
+
+
+    let registration = {
+        name: '',
+        location: '',
+        licenseNumber: '',
+        id: '',
+    };
+    
+    let commission = {
+        phone: '',
+        id: '',
+        pin: '',
+    };
+    
 
     let response = '';
     
@@ -47,17 +49,23 @@ exports.handleUssdRequest = (req, res) => {
         response = `CON Enter your ID number`;
     } else if (text.startsWith('1*') && registration.name && registration.location && registration.licenseNumber && !registration.id) {
 
-        // Save ID number and terminate
         registration.id = text.slice(2);
-        response = `END Thank you for registering your shop with us!`;
+        const newRegistration = new Registration(registration);
+        newRegistration.save()
+          .then(() => {
+            response = 'END Thank you for registering your shop with us!';
+            registration = {
+              name: '',
+              location: '',
+              licenseNumber: '',
+              id: ''
+            };
+          })
+          .catch(err => {
+            response = 'END Error saving registration: ' + err;
+          });
 
-        // Clear registration object for next registration
-        registration = {
-            name: '',
-            location: '',
-            licenseNumber: '',
-            id: ''
-        };
+    
     }  else if (text == '2') {
         // Ask for phone number
         response = `CON Enter your phone number`;
@@ -71,13 +79,21 @@ exports.handleUssdRequest = (req, res) => {
         response = `CON Enter your PIN`;
     } else if (text.startsWith('2*') && commission.phone && commission.id && !commission.pin) {
         // Save PIN and terminate
+        // Save PIN and terminate
         commission.pin = text.slice(2);
-        response = `END Your commission balance is $100`;
-        // Clear commission object for next commission check
-        commission = {
+        const newCommission = new Commission(commission);
+        newCommission.save()
+        .then(() => {
+            response = 'END Your commission balance is $100';
+            commission = {
             phone: '',
             id: '',
             pin: ''
-        };
+            };
+        })
+        .catch(err => {
+            response = 'END Error saving commission: ' + err;
+        });
+
     }
 }

@@ -3,21 +3,39 @@ const bodyParser = require('body-parser');
 const mongoose = require("mongoose");
 require('dotenv').config();
 
+const db = require('./db');
+
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-const PORT = 8000;
+const PORT = 3000;
 
-mongoose.set("strictQuery" , false);
-mongoose.connect(process.env.MONGO_URL)
-    .then(() => {
-        console.log('database connected');
-    })
-    .catch((err) => {
-        console.log(`Error connecting to database. ${err}`);
-    });
+const { handleUssdRequest } = require('./ussd');
 
-app.use('/', require('./routes/routes'));
+app.use(express.json());
+
+app.post('/', (req, res) => {
+  handleUssdRequest(req, res);
+  console()
+});
+
+const registrationSchema = new mongoose.Schema({
+  name: String,
+  location: String,
+  licenseNumber: String,
+  id: String
+});
+
+const Registration = mongoose.model('Registration', registrationSchema);
+
+const commissionSchema = new mongoose.Schema({
+  phone: String,
+  id: String,
+  pin: String
+});
+
+const Commission = mongoose.model('Commission', commissionSchema);
+
 
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
